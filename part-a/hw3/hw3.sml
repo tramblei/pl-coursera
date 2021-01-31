@@ -90,19 +90,14 @@ fun check_pat p =
 	end
 
 fun match (v, p) =
-	case p of
-		Wildcard => SOME []
-		| Variable s => SOME [(s,v)]
-		| UnitP => if v = Unit then SOME [] else NONE
-		| ConstP x1 => (case v of
-			Const x2 => if x1 = x2 then SOME [] else NONE
-			| _ => NONE)
-		| TupleP ps => (case v of
-			Tuple vs => if List.length ps <> List.length vs then NONE else all_answers (fn (v',p') => match (v', p')) (ListPair.zip (vs, ps))
-			| _ => NONE)
-		| ConstructorP (s1, p') => (case v of
-			Constructor (s2, v') => if s1 = s2 then match (v', p') else NONE
-			| _ => NONE )
+	case (v,p) of
+		(_,Wildcard) => SOME []
+		| (_, Variable s) => SOME [(s,v)]
+		| (Unit, UnitP) => SOME []
+		| (Const x1, ConstP x2) => if x1 = x2 then SOME [] else NONE
+		| (Tuple vs, TupleP ps) => if List.length ps <> List.length vs then NONE else all_answers (fn (v',p') => match (v', p')) (ListPair.zip (vs, ps))
+		| (Constructor (s2, v'), ConstructorP (s1, p')) => if s1 = s2 then match (v', p') else NONE
+		| _ => NONE 
 
 fun first_match v ps =
 	SOME (first_answer (fn p => match (v, p)) ps)
