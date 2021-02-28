@@ -61,9 +61,8 @@
                     (let ([p (vector-ref vec i)])
                       (cond
                         [(not (pair? p)) (f (+ i 1))]
-                        [#t (if (equal? (car p) v)
-                                p
-                                (f (+ i 1)))]))))])
+                        [(equal? (car p) v) p]
+                        [#t (f (+ i 1))]))))])
     (f 0)))
 
 ; 10
